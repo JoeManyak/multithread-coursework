@@ -86,6 +86,7 @@ func (n *Node) MultiThreadSearch(threads int) *Node {
 
 	select {
 	case res := <-ch:
+		<-waiter
 		return res
 	case _ = <-waiter:
 		return nil
@@ -98,25 +99,26 @@ func waitAsChan(ch chan struct{}, wg *sync.WaitGroup) {
 }
 
 func (n *Node) multiThreadSearchUtil(wg *sync.WaitGroup, ch chan *Node, stopper *bool, controller chan struct{}) {
+	controller <- struct{}{}
 	defer func() {
-		<-controller
 		wg.Done()
+		<-controller
 	}()
 
+	if *stopper {
+		return
+	}
 	if n.IsNeeded {
 		*stopper = true
 		ch <- n
-		close(controller)
 		return
 	}
 	if n.Left != nil {
 		wg.Add(1)
-		controller <- struct{}{}
 		go n.Left.multiThreadSearchUtil(wg, ch, stopper, controller)
 	}
 	if n.Right != nil {
 		wg.Add(1)
-		controller <- struct{}{}
 		go n.Right.multiThreadSearchUtil(wg, ch, stopper, controller)
 	}
 }
