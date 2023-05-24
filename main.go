@@ -16,13 +16,13 @@ func main() {
 		fmt.Println("Multi Thread Search...")
 		now := time.Now()
 		fmt.Println(t.MultiThreadSearch(5))
-		fmt.Println("Multi thread estimate: ", time.Since(now))
+		fmt.Printf("Multi thread estimate:  %d nanoseconds\n", time.Since(now).Nanoseconds())
 
 		fmt.Println("--------------------")
 		fmt.Println("Single Thread Search...")
 		now = time.Now()
 		fmt.Println(t.SingleThreadSearch())
-		fmt.Println("Single thread estimate: ", time.Since(now))
+		fmt.Printf("Single thread estimate: %d nanoseconds\n", time.Since(now).Nanoseconds())
 		time.Sleep(time.Second * 5)
 	}
 }
