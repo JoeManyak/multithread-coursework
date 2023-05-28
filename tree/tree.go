@@ -46,27 +46,27 @@ func (n *Node) generateSearchPlace(depthLeft int) {
 }
 
 func (n *Node) SingleThreadSearch() *Node {
-	res := make(chan *Node, 1)
-	n.singleThreadSearchUtil(res)
-	select {
-	case node := <-res:
-		return node
-	default:
-		return nil
-	}
+	return n.singleThreadSearchUtil()
 }
 
-func (n *Node) singleThreadSearchUtil(res chan *Node) {
+func (n *Node) singleThreadSearchUtil() *Node {
 	if n.IsNeeded {
-		res <- n
-		return
+		return n
 	}
 	if n.Left != nil {
-		n.Left.singleThreadSearchUtil(res)
+		node := n.Left.singleThreadSearchUtil()
+		if node != nil {
+			return node
+		}
 	}
 	if n.Right != nil {
-		n.Right.singleThreadSearchUtil(res)
+		node := n.Right.singleThreadSearchUtil()
+		if node != nil {
+			return node
+		}
 	}
+
+	return nil
 }
 
 func (n *Node) MultiThreadSearch(threads int) *Node {
