@@ -2,13 +2,13 @@ package tree
 
 import (
 	"math/rand"
-	"sync"
 )
 
 var r = rand.New(rand.NewSource(0))
 
 type Node struct {
 	IsNeeded bool
+	Visited  bool
 	Left     *Node
 	Right    *Node
 }
@@ -16,8 +16,19 @@ type Node struct {
 func GenerateTree(depth int) Node {
 	MainNode := Node{IsNeeded: false}
 	MainNode.setupChildren(depth)
-	MainNode.generateSearchPlace(depth / 2)
+	/*r = rand.New(rand.NewSource(time.Now().Unix()))
+	MainNode.generateSearchPlace(depth * 2 / 3)*/
 	return MainNode
+}
+
+func (n *Node) RemoveVisitors() {
+	n.Visited = false
+	if n.Left != nil {
+		n.Left.RemoveVisitors()
+	}
+	if n.Right != nil {
+		n.Right.RemoveVisitors()
+	}
 }
 
 func (n *Node) setupChildren(depthLeft int) {
@@ -42,83 +53,5 @@ func (n *Node) generateSearchPlace(depthLeft int) {
 		n.Left.generateSearchPlace(depthLeft - 1)
 	} else {
 		n.Right.generateSearchPlace(depthLeft - 1)
-	}
-}
-
-func (n *Node) SingleThreadSearch() *Node {
-	return n.singleThreadSearchUtil()
-}
-
-func (n *Node) singleThreadSearchUtil() *Node {
-	if n.IsNeeded {
-		return n
-	}
-	if n.Left != nil {
-		node := n.Left.singleThreadSearchUtil()
-		if node != nil {
-			return node
-		}
-	}
-	if n.Right != nil {
-		node := n.Right.singleThreadSearchUtil()
-		if node != nil {
-			return node
-		}
-	}
-
-	return nil
-}
-
-func (n *Node) MultiThreadSearch(threads int) *Node {
-	wg := sync.WaitGroup{}
-	ch := make(chan *Node, 1)
-	threadController := make(chan struct{}, threads)
-
-	stopper := false
-
-	wg.Add(1)
-
-	threadController <- struct{}{}
-	go n.multiThreadSearchUtil(&wg, ch, &stopper, threadController)
-
-	waiter := make(chan struct{})
-	go waitAsChan(waiter, &wg)
-
-	select {
-	case res := <-ch:
-		<-waiter
-		return res
-	case _ = <-waiter:
-		return nil
-	}
-}
-
-func waitAsChan(ch chan struct{}, wg *sync.WaitGroup) {
-	wg.Wait()
-	ch <- struct{}{}
-}
-
-func (n *Node) multiThreadSearchUtil(wg *sync.WaitGroup, ch chan *Node, stopper *bool, controller chan struct{}) {
-	controller <- struct{}{}
-	defer func() {
-		wg.Done()
-		<-controller
-	}()
-
-	if *stopper {
-		return
-	}
-	if n.IsNeeded {
-		*stopper = true
-		ch <- n
-		return
-	}
-	if n.Left != nil {
-		wg.Add(1)
-		go n.Left.multiThreadSearchUtil(wg, ch, stopper, controller)
-	}
-	if n.Right != nil {
-		wg.Add(1)
-		go n.Right.multiThreadSearchUtil(wg, ch, stopper, controller)
 	}
 }
