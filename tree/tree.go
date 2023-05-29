@@ -16,8 +16,8 @@ type Node struct {
 func GenerateTree(depth int) Node {
 	MainNode := Node{IsNeeded: false}
 	MainNode.setupChildren(depth)
-	/*r = rand.New(rand.NewSource(time.Now().Unix()))
-	MainNode.generateSearchPlace(depth * 2 / 3)*/
+	r = rand.New(rand.NewSource(0))
+	MainNode.generateSearchPlace(15)
 	return MainNode
 }
 
