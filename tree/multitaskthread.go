@@ -5,13 +5,9 @@ import (
 )
 
 type TaskManager struct {
-	tasks  chan *Task
+	tasks  chan *Node
 	result chan *Node
 	stop   chan struct{}
-}
-
-type Task struct {
-	n *Node
 }
 
 func (t *TaskManager) Run(wg *sync.WaitGroup) {
@@ -19,7 +15,7 @@ func (t *TaskManager) Run(wg *sync.WaitGroup) {
 	for {
 		select {
 		case task := <-t.tasks:
-			task.n.multiTaskThreadSearchUtil(t)
+			task.multiTaskThreadSearchUtil(t)
 			break
 		case <-t.stop:
 			//fmt.Println("GOT STOP SIGNAL")
@@ -33,15 +29,13 @@ func (t *TaskManager) Run(wg *sync.WaitGroup) {
 	}
 }
 
-func (n *Node) MultiTaskThreadSearch(workers int, taskMultiplier int) *Node {
+func (n *Node) MultiTaskThreadSearch(workers int, taskSize int) *Node {
 	taskManager := TaskManager{
-		tasks:  make(chan *Task, workers*taskMultiplier),
+		tasks:  make(chan *Node, taskSize),
 		result: make(chan *Node, 1),
 		stop:   make(chan struct{}, workers),
 	}
-	taskManager.tasks <- &Task{
-		n,
-	}
+	taskManager.tasks <- n
 
 	var wg sync.WaitGroup
 	wg.Add(workers)
@@ -69,9 +63,9 @@ func (n *Node) multiTaskThreadSearchUtil(
 		return
 	}
 	if n.Left != nil {
-		m.tasks <- &Task{n.Left}
+		m.tasks <- n.Left
 	}
 	if n.Right != nil {
-		m.tasks <- &Task{n.Right}
+		m.tasks <- n.Right
 	}
 }
