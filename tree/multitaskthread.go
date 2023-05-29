@@ -2,6 +2,7 @@ package tree
 
 import (
 	"fmt"
+	"math"
 	"sync"
 )
 
@@ -40,9 +41,9 @@ func (t *TaskManager) Run(wg *sync.WaitGroup) {
 	}
 }
 
-func (n *Node) MultiTaskThreadSearch(workers int, taskMultiplier int) *Node {
+func (n *Node) MultiTaskThreadSearch(workers int, thread int) *Node {
 	taskManager := TaskManager{
-		tasks:  blockingChannel{ch: make(chan *Task, workers*taskMultiplier)},
+		tasks:  blockingChannel{ch: make(chan *Task, int(math.Pow(2, float64(thread))))},
 		result: make(chan *Node, 1),
 		stop:   make(chan struct{}, workers),
 	}

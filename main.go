@@ -17,7 +17,7 @@ func main() {
 		fmt.Println("--------------------")
 		fmt.Println("Multi Thread Search...")
 		now := time.Now()
-		println(t.MultiTaskThreadSearch(4, 1000000))
+		println(t.MultiTaskThreadSearch(4, depth))
 		//println(t.MultiThreadSearch(12))
 		time.Sleep(time.Nanosecond)
 		fmt.Println(time.Since(now))
