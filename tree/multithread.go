@@ -33,7 +33,8 @@ func waitAsChan(ch chan struct{}, wg *sync.WaitGroup) {
 func (n *Node) multiThreadSearchUtil(wg *sync.WaitGroup, ch chan *Node, stopper *bool, controller chan struct{}) {
 	defer func() {
 		wg.Done()
-		clearIfCan(controller)
+		<-controller
+		//clearIfCan(controller)
 	}()
 
 	if *stopper {
