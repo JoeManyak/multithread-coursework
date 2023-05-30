@@ -2,7 +2,6 @@ package tree
 
 import (
 	"math/rand"
-	"time"
 )
 
 var r = rand.New(rand.NewSource(0))
@@ -17,8 +16,6 @@ type Node struct {
 func GenerateTree(depth int) Node {
 	MainNode := Node{IsNeeded: false}
 	MainNode.setupChildren(depth)
-	r = rand.New(rand.NewSource(time.Now().Unix()))
-	MainNode.generateSearchPlace(depth)
 	return MainNode
 }
 
@@ -44,15 +41,15 @@ func (n *Node) setupChildren(depthLeft int) {
 	n.Right.setupChildren(depthLeft - 1)
 }
 
-func (n *Node) generateSearchPlace(depthLeft int) {
+func (n *Node) GenerateSearchPlace(depthLeft int) {
 	if depthLeft <= 0 {
 		n.IsNeeded = true
 		return
 	}
 	move := r.Intn(2)
 	if move == 1 {
-		n.Right.generateSearchPlace(depthLeft - 1)
+		n.Right.GenerateSearchPlace(depthLeft - 1)
 	} else {
-		n.Right.generateSearchPlace(depthLeft - 1)
+		n.Right.GenerateSearchPlace(depthLeft - 1)
 	}
 }

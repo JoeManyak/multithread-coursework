@@ -7,9 +7,13 @@ import (
 	"time"
 )
 
-const depth = 15
+const (
+	depth     = 20
+	depthTask = 11
+)
 
 func main() {
+	//should use this in case of binary tree as maximum tasks
 	taskSize := int(math.Pow(2, depth))
 
 	fmt.Println("--------------------")
@@ -19,25 +23,8 @@ func main() {
 	fmt.Println("--------------------")
 	fmt.Println("Multi Thread Search...")
 	now := time.Now()
-	println(t.MultiTaskThreadSearch(4, taskSize, 3))
-	//println(t.MultiThreadSearch(12))
+	println(t.MultiTaskThreadSearch(12, taskSize, depthTask))
 	time.Sleep(time.Nanosecond)
 	fmt.Println(time.Since(now))
 	fmt.Printf("Multi thread estimate:  %d nanoseconds\n", time.Since(now).Nanoseconds())
-
-	t.RemoveVisitors()
-	time.Sleep(time.Second * 2)
-
-	fmt.Println("--------------------")
-	fmt.Println("Single Thread Search...")
-	now = time.Now()
-	println(t.SingleThreadSearch())
-	time.Sleep(time.Nanosecond)
-	fmt.Println(time.Since(now))
-	fmt.Printf("Single thread estimate: %d nanoseconds\n", time.Since(now).Nanoseconds())
-
-	t.RemoveVisitors()
-
-	time.Sleep(time.Second * 5)
-
 }

@@ -19,13 +19,11 @@ func (t *TaskManager) Run(wg *sync.WaitGroup) {
 			task.multiTaskThreadSearchUtil(t, t.depth)
 			break
 		case <-t.stop:
-			//fmt.Println("GOT STOP SIGNAL")
 			t.stop <- struct{}{}
 			return
-			/*		default:
-					t.stop <- struct{}{}
-					//fmt.Println("NO TASK, ENDING THREAD...")
-					return*/
+		default:
+			t.stop <- struct{}{}
+			return
 		}
 	}
 }
@@ -41,8 +39,11 @@ func (n *Node) MultiTaskThreadSearch(workers int, taskSize int, depth int) *Node
 
 	var wg sync.WaitGroup
 	wg.Add(workers)
-	for i := 0; i < workers; i++ {
+	go taskManager.Run(&wg)
+	for i := 0; i < workers-1; i++ {
+		t := <-taskManager.tasks
 		go taskManager.Run(&wg)
+		taskManager.tasks <- t
 	}
 
 	ch := make(chan struct{})
@@ -54,6 +55,11 @@ func (n *Node) MultiTaskThreadSearch(workers int, taskSize int, depth int) *Node
 	case <-ch:
 		return nil
 	}
+}
+
+func waitAsChan(ch chan struct{}, wg *sync.WaitGroup) {
+	wg.Wait()
+	ch <- struct{}{}
 }
 
 func (n *Node) multiTaskThreadSearchUtil(
