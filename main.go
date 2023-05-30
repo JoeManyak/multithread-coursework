@@ -2,13 +2,16 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"multidfs/tree"
 	"time"
 )
 
-const depth = 25
+const depth = 15
 
 func main() {
+	taskSize := int(math.Pow(2, depth))
+
 	fmt.Println("--------------------")
 	fmt.Println("Tree Generating...")
 	t := tree.GenerateTree(depth)
@@ -16,7 +19,7 @@ func main() {
 	fmt.Println("--------------------")
 	fmt.Println("Multi Thread Search...")
 	now := time.Now()
-	println(t.MultiTaskThreadSearch(12, 500000))
+	println(t.MultiTaskThreadSearch(4, taskSize, 3))
 	//println(t.MultiThreadSearch(12))
 	time.Sleep(time.Nanosecond)
 	fmt.Println(time.Since(now))
